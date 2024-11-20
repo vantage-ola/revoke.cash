@@ -1,5 +1,3 @@
-'use client';
-
 import { useMounted } from 'lib/hooks/useMounted';
 import { getChainLogo, getChainName, isSupportedChain } from 'lib/utils/chains';
 import { twMerge } from 'tailwind-merge';
@@ -17,8 +15,13 @@ interface Props {
 
 const ChainLogo = ({ chainId, size, tooltip, className, checkMounted }: Props) => {
   const isMounted = useMounted();
-  const name = getChainName(chainId);
-  const src = getChainLogo(chainId);
+
+  // Check local storage for cached chain data
+  const cachedChains = JSON.parse(localStorage.getItem('chainData') || '{}');
+  const chainData = cachedChains[chainId];
+
+  const name = chainData?.value || getChainName(chainId); // Use cached name or fallback to original
+  const src = chainData?.logo || getChainLogo(chainId); // Use cached logo or fallback to original
   const classes = twMerge(!isSupportedChain(chainId) && 'grayscale', className);
 
   if (checkMounted && !isMounted) {
